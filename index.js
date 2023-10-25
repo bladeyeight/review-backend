@@ -6,6 +6,9 @@ const PORT = 5000;
 
 const Review = require('./models/review');
 
+app.use(cors());
+app.use(express.json());
+
 const MONGO_URI = 'mongodb+srv://user:4G1vpqwHWZZPfUxZ@game-reviews.zyyxx2f.mongodb.net/?retryWrites=true&w=majority';
 
 mongoose.connect(MONGO_URI, {
@@ -26,6 +29,21 @@ app.get('/reviews', async (req, res) => {
   }
 });
 
+app.get('/reviews/:id', async (req, res) => {
+    try {
+        const review = await Review.findById(req.params.id);
+        
+        if (!review) {
+            return res.status(404).send('Review not found');
+        }
+
+        res.json(review);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
 app.post('/reviews', async (req, res) => {
   const newReview = new Review({
     title: req.body.title,
@@ -40,9 +58,6 @@ app.post('/reviews', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-
-app.use(cors());
-app.use(express.json());
 
 // ... (server start code)
 
